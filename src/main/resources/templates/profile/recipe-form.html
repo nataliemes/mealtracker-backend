@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="#{addrecipe}"></title>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<div th:replace="fragments/header :: header"></div>
+
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-body">
+            <h2 class="mb-4" th:text="#{addrecipe}"></h2>
+
+            <form th:action="@{/recipes/new}" th:object="${recipe}" method="post" id="recipeForm">
+                <div class="mb-3">
+                    <label for="name" class="form-label" th:text="#{recipe-name}"></label>
+                    <input type="text" class="form-control" th:field="*{name}" id="name" required>
+                </div>
+
+                <h4 class="mt-4" th:text="#{ingredients}"></h4>
+                <div id="ingredientsContainer">
+                    <div class="row g-3 mb-3 ingredient-block">
+                        <div class="col-md-7">
+                            <label class="form-label" th:text="#{ingredient}"></label>
+                            <select class="form-select" name="ingredients[0].ingredientId" required>
+                                <option value="" disabled selected th:text="#{select-ingredient}"></option>
+                                <!-- Server renders options here -->
+                                <option th:each="ing : ${allIngredients}"
+                                        th:value="${ing.id}"
+                                        th:text="${ing.name}">
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label" th:text="#{amount}"></label>
+                            <input type="number" name="ingredients[0].quantity" min="1" class="form-control" required>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" class="btn btn-secondary" id="addIngredientBtn">➕ <span th:text="#{add-ingredient}"></span></button>
+                <button type="submit" class="btn btn-primary ms-2">✅ <span th:text="#{addrecipe}"></span></button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden template for ingredient options -->
+<select id="ingredientOptionsTemplate" style="display:none;">
+    <option value="" disabled selected th:text="#{select-ingredient}"></option>
+    <option th:each="ing : ${allIngredients}" th:value="${ing.id}" th:text="${ing.name}"></option>
+</select>
+
+<div th:replace="fragments/footer :: footer"></div>
+
+<script>
+    let ingredientIndex = 1;
+
+    const optionsHTML = document.getElementById('ingredientOptionsTemplate').innerHTML;
+
+    document.getElementById('addIngredientBtn').addEventListener('click', function () {
+        const container = document.getElementById('ingredientsContainer');
+
+        const row = document.createElement('div');
+        row.className = 'row g-3 mb-3 ingredient-block';
+
+        // Build inner HTML manually, using the optionsHTML we grabbed from the hidden select
+        row.innerHTML = `
+            <div class="col-md-7">
+                <label class="form-label">Ingredient</label>
+                <select class="form-select" name="ingredients[${ingredientIndex}].ingredientId" required>
+                    ${optionsHTML}
+                </select>
+            </div>
+            <div class="col-md-5">
+                <label class="form-label">Amount (g)</label>
+                <input type="number" name="ingredients[${ingredientIndex}].quantity" min="1" class="form-control" required>
+            </div>
+        `;
+
+        container.appendChild(row);
+        ingredientIndex++;
+    });
+</script>
+
+</body>
+</html>

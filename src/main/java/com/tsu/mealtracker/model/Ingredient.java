@@ -8,6 +8,8 @@ import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+
 import java.util.List;
 
 
@@ -21,14 +23,18 @@ public class Ingredient {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Ingredient name must not be blank")
+
     private String name;
 
-    @PositiveOrZero(message = "Sugar per 100g quantity must be zero or positive")
     private double sugarPer100g;
 
-    @Valid
+//    @Valid   // recipes are already gonna be validated
     @JsonIgnore
+    @ToString.Exclude
     @OneToMany(mappedBy = "ingredient", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RecipeIngredient> recipes;
+
+    @ManyToOne
+    @JoinColumn(name = "user_username", nullable = false)
+    private User user;
 }

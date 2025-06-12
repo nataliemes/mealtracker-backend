@@ -7,6 +7,8 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+
 import java.util.List;
 
 
@@ -20,11 +22,16 @@ public class Recipe {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Recipe name must not be blank")
+
     private String name;
 
-    @Valid
-    @Size(min = 1, message = "Recipe must have at least one ingredient")
+
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
     private List<RecipeIngredient> ingredients;
+
+
+    @ManyToOne
+    @JoinColumn(name = "user_username", nullable = false)
+    private User user;
 }

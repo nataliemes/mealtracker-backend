@@ -1,31 +1,28 @@
 package com.tsu.mealtracker.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import jakarta.validation.constraints.Positive;
-
-
+import lombok.ToString;
 
 @Entity
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"username", "authority"})})
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RecipeIngredient {
+public class Authority {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    private Ingredient ingredient;
+    @JoinColumn(name = "username", nullable = false)
+    @ToString.Exclude
+    private User user;
 
-    @JsonIgnore
-    @ManyToOne
-    private Recipe recipe;
-
-    private double quantity;  // in grams
+    @Column(nullable = false)
+    private String authority;
 }
-
-
