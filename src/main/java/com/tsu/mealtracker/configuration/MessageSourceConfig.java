@@ -13,7 +13,7 @@ public class MessageSourceConfig {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
         messageSource.setBasename("classpath:messages");
         messageSource.setDefaultEncoding("UTF-8");
-        messageSource.setFallbackToSystemLocale(false); // <--- THIS fixes your issue
+        messageSource.setFallbackToSystemLocale(false);
         return messageSource;
     }
 }

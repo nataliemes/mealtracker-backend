@@ -10,6 +10,6 @@ public class RecipeIngredientForm {
     @NotNull
     private Long ingredientId;  // Selected from user's ingredients
 
-    @Positive(message = "Quantity must be positive")
+    @Positive(message = "{ingredient.quantity}")
     private double quantity;
 }

@@ -2,9 +2,6 @@ package com.tsu.mealtracker.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,7 +25,7 @@ public class Ingredient {
 
     private double sugarPer100g;
 
-//    @Valid   // recipes are already gonna be validated
+    // @Valid   // recipes are already gonna be validated
     @JsonIgnore
     @ToString.Exclude
     @OneToMany(mappedBy = "ingredient", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -4,6 +4,7 @@ import com.tsu.mealtracker.model.Authority;
 import com.tsu.mealtracker.model.User;
 import com.tsu.mealtracker.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,6 +17,7 @@ import java.util.Set;
 @Component
 @Profile("dev")
 @RequiredArgsConstructor
+@Slf4j
 public class DevUserInitializer implements CommandLineRunner {
 
     private final UserRepository userRepository;
@@ -38,15 +40,22 @@ public class DevUserInitializer implements CommandLineRunner {
         user.setAuthorities(authorities);
 
         userRepository.save(user);
+
+        log.info("Created user '{}' with role '{}'", username, isAdmin ? "ADMIN" : "USER");
     }
 
     @Override
     public void run(String... args) {
         if (userRepository.count() == 0) {
+            log.info("No users found in database, initializing default users...");
             saveNewUser("admin", passwordEncoder.encode("adminpass"), true);
             saveNewUser("anna", passwordEncoder.encode("anna"), false);
             saveNewUser("amelia", passwordEncoder.encode("amelia"), false);
             saveNewUser("luca", passwordEncoder.encode("luca"), false);
+            log.info("User initialization complete.");
+        }
+        else {
+            log.info("Users already exist in the database. Skipping initialization.");
         }
     }
 }

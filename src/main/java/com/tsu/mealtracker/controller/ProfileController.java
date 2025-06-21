@@ -1,58 +1,47 @@
 package com.tsu.mealtracker.controller;
 
-import com.tsu.mealtracker.dto.IngredientDTO;
-import com.tsu.mealtracker.dto.RecipeDTO;
-import com.tsu.mealtracker.dto.RecipeIngredientDTO;
-import com.tsu.mealtracker.repository.IngredientRepository;
-import com.tsu.mealtracker.repository.RecipeRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
+import com.tsu.mealtracker.dto.UserDTO;
 
-import java.util.List;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+
+import org.springframework.security.core.userdetails.UserDetails;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import java.util.stream.Collectors;
 
-@Controller
+
+@RestController
+@RequestMapping
 @RequiredArgsConstructor
+@Slf4j
 public class ProfileController {
 
-    private final RecipeRepository recipeRepo;
-    private final IngredientRepository ingredientRepo;
-
     @GetMapping("/profile")
-    public String showProfile(Model model, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<UserDTO> getCurrentUser(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            log.warn("Unauthorized access attempt to /profile endpoint");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
-//        List<RecipeDTO> recipeDTOs = recipeRepo.findByUserUsername(userDetails.getUsername()).stream()
-//                .map(recipe -> {
-//                    RecipeDTO recipeDTO = new RecipeDTO();
-//                    recipeDTO.setName(recipe.getName());
-//
-//                    List<RecipeIngredientDTO> ingredientDTOs = recipe.getIngredients().stream()
-//                            .map(ri -> {
-//                                RecipeIngredientDTO riDTO = new RecipeIngredientDTO();
-//                                riDTO.setQuantity(ri.getQuantity());
-//                                riDTO.setIngredientId(ri.getIngredient().getId());
-//                                return riDTO;
-//                            })
-//                            .collect(Collectors.toList());
-//
-//                    recipeDTO.setIngredients(ingredientDTOs);
-//                    return recipeDTO;
-//                })
-//                .collect(Collectors.toList());
-//
-//        model.addAttribute("recipes", recipeDTOs);
-//
-//        List<IngredientDTO> ingredientDTOs = ingredientRepo.findByUserUsername(userDetails.getUsername()).stream()
-//                .map(i -> new IngredientDTO(i.getName(), i.getSugarPer100g()))
-//                .collect(Collectors.toList());
-//
-//        model.addAttribute("ingredients", ingredientDTOs);
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-        return "profile/homepage";
+        log.info("User '{}' profile accessed", userDetails.getUsername());
+
+        UserDTO userDto = new UserDTO();
+        userDto.setUsername(userDetails.getUsername());
+        userDto.setAuthorities(userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList()));
+
+        return ResponseEntity.ok(userDto);
     }
 
 }
