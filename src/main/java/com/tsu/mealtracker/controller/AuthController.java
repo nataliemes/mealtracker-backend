@@ -7,6 +7,7 @@ import com.tsu.mealtracker.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Cookie;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -99,6 +100,12 @@ public class AuthController {
         if (auth != null) {
             log.info("Logging out user '{}'", auth.getName());
             new SecurityContextLogoutHandler().logout(request, response, auth);
+
+            Cookie cookie = new Cookie("JSESSIONID", null);
+            cookie.setPath("/");
+            cookie.setHttpOnly(true);
+            cookie.setMaxAge(0);
+            response.addCookie(cookie);
         }
 
         String message = messageSource.getMessage("logout.success", null, locale);
